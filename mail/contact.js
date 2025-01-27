@@ -1,5 +1,9 @@
-$(function () {
+// Configura tu Public Key (User ID) y el ID de servicio y plantilla
+const userID = 'NfCaHlIKtapzHNPjW'; // Reemplaza con tu Public Key (User ID)
+const serviceID = 'service_coy5hnb'; // Tu ID de servicio
+const templateID = 'template_zb5hhco'; // Tu ID de plantilla
 
+$(function () {
     $("#contactForm input, #contactForm textarea").jqBootstrapValidation({
         preventSubmit: true,
         submitError: function ($form, event, errors) {
@@ -14,36 +18,30 @@ $(function () {
             $this = $("#sendMessageButton");
             $this.prop("disabled", true);
 
-            // Usando EmailJS en lugar de AJAX
-            emailjs.send("service_coy5hnb", "template_zb5hhco", {
-                name: name,
-                email: email,
-                subject: subject,
-                message: message
-            }).then(function(response) {
-                // Mostrar mensaje de éxito
-                $('#success').html("<div class='alert alert-success'>");
-                $('#success > .alert-success').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
+            // Usamos EmailJS para enviar el formulario
+            emailjs.sendForm(serviceID, templateID, '#contactForm', userID)
+                .then(function(response) {
+                    $('#success').html("<div class='alert alert-success'>");
+                    $('#success > .alert-success').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
                         .append("</button>");
-                $('#success > .alert-success')
+                    $('#success > .alert-success')
                         .append("<strong>Your message has been sent. </strong>");
-                $('#success > .alert-success')
+                    $('#success > .alert-success')
                         .append('</div>');
-                $('#contactForm').trigger("reset");
-            }, function(error) {
-                // Mostrar mensaje de error
-                $('#success').html("<div class='alert alert-danger'>");
-                $('#success > .alert-danger').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
+                    $('#contactForm').trigger("reset");
+                }, function(error) {
+                    $('#success').html("<div class='alert alert-danger'>");
+                    $('#success > .alert-danger').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
                         .append("</button>");
-                $('#success > .alert-danger').append($("<strong>").text("Sorry " + name + ", it seems that our mail server is not responding. Please try again later!"));
-                $('#success > .alert-danger').append('</div>');
-                $('#contactForm').trigger("reset");
-            }).finally(function() {
-                // Rehabilitar el botón de envío
-                setTimeout(function () {
-                    $this.prop("disabled", false);
-                }, 1000);
-            });
+                    $('#success > .alert-danger').append($("<strong>").text("Sorry " + name + ", it seems that our mail server is not responding. Please try again later!"));
+                    $('#success > .alert-danger').append('</div>');
+                    $('#contactForm').trigger("reset");
+                })
+                .finally(function () {
+                    setTimeout(function () {
+                        $this.prop("disabled", false);
+                    }, 1000);
+                });
         },
         filter: function () {
             return $(this).is(":visible");
